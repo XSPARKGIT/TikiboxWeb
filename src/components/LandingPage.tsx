@@ -106,7 +106,7 @@ const PhoneSimulator = ({
     <motion.div
       animate={prefersReducedMotion ? undefined : { y: [0, -6, 0], rotateZ: [0, -0.6, 0] }}
       transition={prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-      className="relative h-[590px] w-[288px] rounded-[2.5rem] bg-[#101010] p-[10px] shadow-2xl ring-1 ring-white/10"
+      className="relative h-[500px] w-[246px] rounded-[2.2rem] bg-[#101010] p-2.5 shadow-2xl ring-1 ring-white/10 sm:h-[590px] sm:w-[288px] sm:rounded-[2.5rem] sm:p-[10px]"
     >
       <motion.div
         animate={prefersReducedMotion ? undefined : { opacity: [0.15, 0.35, 0.15] }}
@@ -121,7 +121,7 @@ const PhoneSimulator = ({
       <div className="absolute right-[-2px] top-44 h-20 w-1 rounded-full bg-[#1f1f1f]" />
       <div className="absolute left-[-2px] top-36 h-16 w-1 rounded-full bg-[#1f1f1f]" />
 
-      <div className="relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/5 bg-black">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/5 bg-black sm:rounded-[2rem]">
         <AmbientVideo
           sources={videoSources}
           title={videoTitle}
@@ -147,7 +147,7 @@ const Section = ({
   className?: string;
   id?: string;
 }) => (
-  <section id={id} className={`relative flex min-h-screen flex-col justify-center px-6 py-32 md:py-48 ${className}`}>
+  <section id={id} className={`relative flex min-h-screen flex-col justify-center px-4 py-24 sm:px-6 sm:py-28 md:py-40 ${className}`}>
     {children}
   </section>
 );
@@ -156,11 +156,11 @@ const ParallaxText = ({ children }: { children: string }) => {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div className="overflow-hidden whitespace-nowrap py-10 tracking-tighter leading-[0.8]">
+    <div className="overflow-hidden whitespace-nowrap py-8 leading-[0.8] tracking-tighter sm:py-10">
       <motion.div
         animate={prefersReducedMotion ? undefined : { x: ['0%', '-18%'] }}
         transition={prefersReducedMotion ? undefined : { duration: 28, repeat: Infinity, ease: 'linear' }}
-        className="flex gap-12 whitespace-nowrap font-display text-[15vw] font-black uppercase opacity-5"
+        className="flex gap-8 whitespace-nowrap font-display text-[18vw] font-black uppercase opacity-5 sm:gap-12 sm:text-[15vw]"
       >
         <span>{children}</span>
         <span>{children}</span>
@@ -196,12 +196,12 @@ const LaptopAnimation = ({
   const captionY = useTransform(scrollYProgress, [0, 0.5, 1], [18, 0, -12]);
 
   return (
-    <div ref={containerRef} className="mt-24 flex w-full flex-col items-center justify-center">
+    <div ref={containerRef} className="mt-16 flex w-full flex-col items-center justify-center sm:mt-24">
       <motion.div
         style={{ opacity }}
         animate={prefersReducedMotion ? undefined : { y: [0, -4, 0] }}
         transition={prefersReducedMotion ? undefined : { duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative aspect-[16/10] w-full max-w-[600px] [perspective:2000px]"
+        className="relative aspect-[16/10] w-full max-w-[520px] [perspective:2000px] sm:max-w-[600px]"
       >
         <motion.div
           style={{
@@ -239,7 +239,7 @@ const LaptopAnimation = ({
         </div>
       </motion.div>
 
-      <motion.p style={{ opacity, y: captionY }} className="mt-8 text-[8px] font-black uppercase tracking-[0.4em] text-tikibox-navy/20">
+      <motion.p style={{ opacity, y: captionY }} className="mt-6 text-[7px] font-black uppercase tracking-[0.32em] text-tikibox-navy/20 sm:mt-8 sm:text-[8px] sm:tracking-[0.4em]">
         {caption}
       </motion.p>
     </div>
@@ -308,14 +308,14 @@ export default function LandingPage() {
     <div id="top" ref={containerRef} className="overflow-x-hidden bg-white text-tikibox-navy selection:bg-tikibox-orange selection:text-white">
       <motion.div className="fixed left-0 right-0 top-0 z-50 h-1 origin-left bg-tikibox-orange-gradient" style={{ scaleX: smoothProgress }} />
 
-      <Section className="min-h-screen justify-between overflow-hidden bg-[#1a1a2e] !pt-4 text-white">
+      <Section className="min-h-screen justify-between overflow-hidden bg-[#1a1a2e] !pt-3 text-white sm:!pt-4">
         <motion.div
           style={{ y: heroGlowY, scale: heroGlowScale }}
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(229,112,32,0.18),transparent_32%),radial-gradient(circle_at_15%_80%,rgba(185,49,49,0.28),transparent_28%),radial-gradient(circle_at_85%_20%,rgba(225,115,43,0.22),transparent_28%)]"
         />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/40 to-transparent" />
 
-        <nav className="relative z-30 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
+        <nav className="relative z-30 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
           <motion.div
             style={{ opacity: navOverlayOpacity }}
             className="pointer-events-none absolute inset-0 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
@@ -336,16 +336,16 @@ export default function LandingPage() {
           <motion.a
             href="#top"
             whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.02 }}
-            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-3"
+            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2 sm:gap-3"
           >
             <motion.div
               animate={prefersReducedMotion ? undefined : { boxShadow: ['0 8px 20px rgba(225,115,43,0.12)', '0 16px 30px rgba(225,115,43,0.28)', '0 8px 20px rgba(225,115,43,0.12)'] }}
               transition={prefersReducedMotion ? undefined : { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-tikibox-orange-gradient shadow-lg shadow-tikibox-orange/20"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-tikibox-orange-gradient shadow-lg shadow-tikibox-orange/20 sm:h-10 sm:w-10"
             >
-              <Wallet className="h-6 w-6 text-tikibox-navy" />
+              <Wallet className="h-5 w-5 text-tikibox-navy sm:h-6 sm:w-6" />
             </motion.div>
-            <span className="font-display text-2xl font-black uppercase tracking-tighter">Tik’iBox</span>
+            <span className="font-display text-xl font-black uppercase tracking-tighter sm:text-2xl">Tik’iBox</span>
           </motion.a>
 
           <div className="hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-white/40 md:flex">
@@ -366,43 +366,43 @@ export default function LandingPage() {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="relative z-20 flex flex-1 flex-col items-center justify-center px-6 text-center"
+          className="relative z-20 flex flex-1 flex-col items-center justify-center px-4 text-center sm:px-6"
         >
-          <motion.p variants={revealUp} className="mb-10 text-[10px] font-black uppercase tracking-[0.5em] text-white/40">
+          <motion.p variants={revealUp} className="mb-8 text-[9px] font-black uppercase tracking-[0.4em] text-white/40 sm:mb-10 sm:text-[10px] sm:tracking-[0.5em]">
             Launch with confidence
           </motion.p>
 
-          <motion.h1 variants={revealUp} className="mb-2 text-center font-display text-5xl font-black uppercase leading-[0.85] tracking-tighter md:text-7xl lg:text-8xl">
+          <motion.h1 variants={revealUp} className="mb-3 text-center font-display text-[2.65rem] font-black uppercase leading-[0.88] tracking-tighter sm:mb-2 sm:text-5xl md:text-7xl lg:text-8xl">
             The Pulse of <br />
             Community Commerce
           </motion.h1>
 
           <motion.div
             variants={revealUp}
-            className="relative mb-12 inline-block overflow-hidden bg-tikibox-orange-gradient px-10 py-5"
+            className="relative mb-10 inline-block overflow-hidden bg-tikibox-orange-gradient px-6 py-3.5 sm:mb-12 sm:px-10 sm:py-5"
           >
             <motion.div
               animate={prefersReducedMotion ? undefined : { x: ['-120%', '130%'] }}
               transition={prefersReducedMotion ? undefined : { duration: 3.8, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.3 }}
               className="pointer-events-none absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-60"
             />
-            <span className="text-center font-display text-3xl font-black uppercase tracking-tighter text-[#1a1a2e] md:text-5xl lg:text-6xl">
+            <span className="text-center font-display text-2xl font-black uppercase tracking-tighter text-[#1a1a2e] sm:text-3xl md:text-5xl lg:text-6xl">
               Without the Friction
             </span>
           </motion.div>
 
-          <motion.p variants={revealUp} className="mb-10 max-w-2xl text-balance text-base font-medium leading-relaxed text-white/55 md:text-lg">
+          <motion.p variants={revealUp} className="mb-8 max-w-xl text-balance text-sm font-medium leading-relaxed text-white/55 sm:mb-10 sm:max-w-2xl sm:text-base md:text-lg">
             Tik’iBox connects neighbourhood buyers, merchants, and suppliers with instant payments, elegant commerce tools, and a digital rhythm that feels local and world-class at the same time.
           </motion.p>
 
-          <motion.div variants={revealUp} style={{ y: heroBadgeY }} className="flex flex-col items-center gap-4">
-            <div className="flex rounded-full bg-white p-2 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+          <motion.div variants={revealUp} style={{ y: heroBadgeY }} className="flex w-full flex-col items-center gap-3 sm:w-auto sm:gap-4">
+            <div className="flex w-full max-w-[21rem] flex-col rounded-[1.75rem] bg-white p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.3)] sm:w-auto sm:max-w-none sm:flex-row sm:rounded-full sm:p-2">
               <motion.button
                 type="button"
                 onClick={() => scrollToSection('individuals')}
                 whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.04 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
-                className="group flex items-center gap-3 rounded-full bg-tikibox-orange-gradient px-10 py-5 text-xs font-black uppercase tracking-widest text-[#1a1a2e]"
+                className="group flex w-full items-center justify-center gap-2.5 rounded-full bg-tikibox-orange-gradient px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.22em] text-[#1a1a2e] sm:w-auto sm:gap-3 sm:px-10 sm:py-5 sm:text-xs sm:tracking-widest"
               >
                 Join as User
                 <motion.span whileHover={prefersReducedMotion ? undefined : { x: 4 }} className="inline-flex">
@@ -414,7 +414,7 @@ export default function LandingPage() {
                 onClick={() => scrollToSection('merchants')}
                 whileHover={prefersReducedMotion ? undefined : { y: -2 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-                className="group flex items-center gap-3 rounded-full px-10 py-5 text-xs font-black uppercase tracking-widest text-[#1a1a2e] transition-all hover:bg-[#1a1a2e]/5"
+                className="group flex w-full items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.22em] text-[#1a1a2e] transition-all hover:bg-[#1a1a2e]/5 sm:w-auto sm:gap-3 sm:px-10 sm:py-5 sm:text-xs sm:tracking-widest"
               >
                 Join as Merchant
                 <motion.span whileHover={prefersReducedMotion ? undefined : { x: 4 }} className="inline-flex">
@@ -423,14 +423,14 @@ export default function LandingPage() {
               </motion.button>
             </div>
 
-            <motion.div variants={staggerContainer} className="flex flex-wrap justify-center gap-3 text-[10px] font-black uppercase tracking-[0.35em] text-white/35">
+            <motion.div variants={staggerContainer} className="flex flex-wrap justify-center gap-2 text-[9px] font-black uppercase tracking-[0.24em] text-white/35 sm:gap-3 sm:text-[10px] sm:tracking-[0.35em]">
               {['Instant Wallets', 'Merchant Growth', 'Supplier Access'].map((item) => (
                 <motion.span
                   key={item}
                   variants={revealUp}
                   animate={prefersReducedMotion ? undefined : { y: [0, -3, 0] }}
                   transition={prefersReducedMotion ? undefined : { duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-sm"
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-sm sm:px-4 sm:py-2"
                 >
                   {item}
                 </motion.span>
@@ -541,22 +541,22 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
-      <Section id="about" className="overflow-hidden bg-white py-24">
+      <Section id="about" className="overflow-hidden bg-white py-20 sm:py-24">
         <ParallaxText>community commerce</ParallaxText>
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="relative mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[1.2fr_1fr]"
+          className="relative mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:gap-10"
         >
           <motion.div variants={revealLeft}>
             <p className="mb-4 text-[10px] font-black uppercase tracking-[0.45em] text-tikibox-orange">About Tik’iBox</p>
-            <h2 className="max-w-4xl font-display text-4xl font-black uppercase leading-[0.9] tracking-tighter text-tikibox-navy md:text-6xl">
+            <h2 className="max-w-4xl font-display text-3xl font-black uppercase leading-[0.92] tracking-tighter text-tikibox-navy sm:text-4xl md:text-6xl">
               Designed for the people who keep neighbourhood economies moving.
             </h2>
           </motion.div>
-          <motion.div variants={revealRight} className="space-y-5 text-base font-medium leading-relaxed text-tikibox-navy/65">
+          <motion.div variants={revealRight} className="space-y-4 text-sm font-medium leading-relaxed text-tikibox-navy/65 sm:space-y-5 sm:text-base">
             <p>
               Tik’iBox gives everyday buyers and ambitious merchants one connected commerce layer: instant payments, local trust, and tools that feel premium without becoming complicated.
             </p>
@@ -571,7 +571,7 @@ export default function LandingPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="mx-auto mt-16 grid max-w-7xl gap-6 px-6 md:grid-cols-3"
+          className="mx-auto mt-12 grid max-w-7xl gap-4 px-4 sm:mt-16 sm:gap-6 sm:px-6 md:grid-cols-3"
         >
           {[
             {
@@ -594,32 +594,32 @@ export default function LandingPage() {
               key={item.title}
               variants={revealUp}
               whileHover={prefersReducedMotion ? undefined : { y: -8, scale: 1.01 }}
-              className="group rounded-[2rem] border border-tikibox-navy/8 bg-white p-8 shadow-[0_20px_40px_rgba(35,35,62,0.06)]"
+              className="group rounded-[1.5rem] border border-tikibox-navy/8 bg-white p-6 shadow-[0_20px_40px_rgba(35,35,62,0.06)] sm:rounded-[2rem] sm:p-8"
             >
               <motion.div whileHover={prefersReducedMotion ? undefined : { rotate: -8, scale: 1.08 }} className="w-fit">
-                <item.icon className="mb-6 h-8 w-8 text-tikibox-orange" />
+                <item.icon className="mb-5 h-7 w-7 text-tikibox-orange sm:mb-6 sm:h-8 sm:w-8" />
               </motion.div>
-              <h3 className="mb-4 font-display text-2xl font-black uppercase tracking-tight text-tikibox-navy">{item.title}</h3>
+              <h3 className="mb-3 font-display text-xl font-black uppercase tracking-tight text-tikibox-navy sm:mb-4 sm:text-2xl">{item.title}</h3>
               <p className="text-sm font-medium leading-relaxed text-tikibox-navy/60">{item.body}</p>
             </motion.div>
           ))}
         </motion.div>
       </Section>
 
-      <Section id="joining" className="bg-white py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <h2 className="mb-4 text-center font-display text-3xl font-black uppercase tracking-tighter text-tikibox-navy md:text-5xl">
+      <Section id="joining" className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <h2 className="mb-4 text-center font-display text-2xl font-black uppercase tracking-tighter text-tikibox-navy sm:text-3xl md:text-5xl">
             Choose your side of commerce
           </h2>
-          <p className="mx-auto mb-16 max-w-2xl text-center text-base font-medium leading-relaxed text-tikibox-navy/55">
+          <p className="mx-auto mb-10 max-w-2xl text-center text-sm font-medium leading-relaxed text-tikibox-navy/55 sm:mb-16 sm:text-base">
             Whether you are buying, paying, stocking, or growing, Tik’iBox is designed to meet you exactly where the money moves.
           </p>
 
-          <div className="grid items-start gap-8 md:grid-cols-2">
+          <div className="grid items-start gap-5 sm:gap-8 md:grid-cols-2">
             <motion.div
               layout
               whileHover={prefersReducedMotion ? undefined : { y: -10 }}
-              className="group relative min-h-[500px] overflow-hidden rounded-[40px] bg-tikibox-navy p-12 text-center shadow-2xl"
+              className="group relative min-h-[420px] overflow-hidden rounded-[2rem] bg-tikibox-navy p-7 text-center shadow-2xl sm:min-h-[500px] sm:rounded-[40px] sm:p-12"
             >
               <motion.div
                 animate={prefersReducedMotion ? undefined : { scale: [1, 1.18, 1], opacity: [0.18, 0.34, 0.18] }}
@@ -627,14 +627,14 @@ export default function LandingPage() {
                 className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-tikibox-orange-gradient opacity-20 transition-transform group-hover:scale-150"
               />
               <div className="relative z-10 mb-8 flex w-full justify-center">
-                <motion.div whileHover={prefersReducedMotion ? undefined : { rotate: -8, scale: 1.06 }} className="flex h-32 w-32 items-center justify-center rounded-3xl bg-white/5 backdrop-blur-sm">
-                  <Store className="h-16 w-16 text-tikibox-orange" />
+                <motion.div whileHover={prefersReducedMotion ? undefined : { rotate: -8, scale: 1.06 }} className="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-white/5 backdrop-blur-sm sm:h-32 sm:w-32 sm:rounded-3xl">
+                  <Store className="h-12 w-12 text-tikibox-orange sm:h-16 sm:w-16" />
                 </motion.div>
               </div>
 
               <div className="relative z-10 space-y-4">
                 <p className="text-xs font-black uppercase tracking-[0.3em] text-tikibox-orange">Joining as a Merchant</p>
-                <h3 className="font-display text-3xl font-black uppercase leading-tight tracking-tighter text-white md:text-4xl">
+                <h3 className="font-display text-2xl font-black uppercase leading-tight tracking-tighter text-white sm:text-3xl md:text-4xl">
                   Ready to grow
                   <br />
                   your business?
@@ -643,14 +643,14 @@ export default function LandingPage() {
 
               <motion.div layout className="relative z-10 w-full">
                 {expandedCard === 'merchant' ? (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-8 space-y-6">
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-6 space-y-5 sm:mt-8 sm:space-y-6">
                     <p className="text-sm leading-relaxed text-white/70">
                       Accept digital payments instantly, understand your sales at a glance, and stay stocked with supplier access built directly into the experience.
                     </p>
                     <button
                       type="button"
                       onClick={() => scrollToSection('merchants')}
-                      className="rounded-full bg-tikibox-orange-gradient px-10 py-4 text-[10px] font-black uppercase tracking-widest text-tikibox-navy transition-all hover:scale-105"
+                      className="rounded-full bg-tikibox-orange-gradient px-8 py-3.5 text-[9px] font-black uppercase tracking-[0.22em] text-tikibox-navy transition-all hover:scale-105 sm:px-10 sm:py-4 sm:text-[10px] sm:tracking-widest"
                     >
                       Explore merchant tools
                     </button>
@@ -659,7 +659,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => setExpandedCard('merchant')}
-                    className="mt-8 rounded-full bg-tikibox-orange-gradient px-12 py-5 text-xs font-black uppercase tracking-widest text-tikibox-navy transition-all hover:scale-105"
+                    className="mt-6 rounded-full bg-tikibox-orange-gradient px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.22em] text-tikibox-navy transition-all hover:scale-105 sm:mt-8 sm:px-12 sm:py-5 sm:text-xs sm:tracking-widest"
                   >
                     Learn more
                   </button>
@@ -670,7 +670,7 @@ export default function LandingPage() {
             <motion.div
               layout
               whileHover={prefersReducedMotion ? undefined : { y: -10 }}
-              className="group relative min-h-[500px] overflow-hidden rounded-[40px] bg-tikibox-orange-gradient p-12 text-center shadow-2xl"
+              className="group relative min-h-[420px] overflow-hidden rounded-[2rem] bg-tikibox-orange-gradient p-7 text-center shadow-2xl sm:min-h-[500px] sm:rounded-[40px] sm:p-12"
             >
               <motion.div
                 animate={prefersReducedMotion ? undefined : { scale: [1, 1.18, 1], opacity: [0.16, 0.28, 0.16] }}
@@ -678,14 +678,14 @@ export default function LandingPage() {
                 className="absolute bottom-0 left-0 -mb-16 -ml-16 h-32 w-32 rounded-full bg-tikibox-navy/10 transition-transform group-hover:scale-150"
               />
               <div className="relative z-10 mb-8 flex w-full justify-center">
-                <motion.div whileHover={prefersReducedMotion ? undefined : { rotate: 8, scale: 1.06 }} className="flex h-32 w-32 items-center justify-center rounded-3xl bg-tikibox-navy/5 backdrop-blur-sm">
-                  <Smartphone className="h-16 w-16 text-tikibox-navy" />
+                <motion.div whileHover={prefersReducedMotion ? undefined : { rotate: 8, scale: 1.06 }} className="flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-tikibox-navy/5 backdrop-blur-sm sm:h-32 sm:w-32 sm:rounded-3xl">
+                  <Smartphone className="h-12 w-12 text-tikibox-navy sm:h-16 sm:w-16" />
                 </motion.div>
               </div>
 
               <div className="relative z-10 space-y-4">
                 <p className="text-xs font-black uppercase tracking-[0.3em] text-tikibox-navy">Joining as a Customer</p>
-                <h3 className="font-display text-3xl font-black uppercase leading-tight tracking-tighter text-tikibox-navy md:text-4xl">
+                <h3 className="font-display text-2xl font-black uppercase leading-tight tracking-tighter text-tikibox-navy sm:text-3xl md:text-4xl">
                   Want a smarter
                   <br />
                   way to pay?
@@ -694,14 +694,14 @@ export default function LandingPage() {
 
               <motion.div layout className="relative z-10 w-full">
                 {expandedCard === 'customer' ? (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-8 space-y-6">
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-6 space-y-5 sm:mt-8 sm:space-y-6">
                     <p className="text-sm leading-relaxed text-tikibox-navy/70">
                       Pay with confidence, move money instantly, and keep every transaction visible in one simple interface designed for daily life.
                     </p>
                     <button
                       type="button"
                       onClick={() => scrollToSection('individuals')}
-                      className="rounded-full bg-tikibox-navy px-10 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:scale-105"
+                      className="rounded-full bg-tikibox-navy px-8 py-3.5 text-[9px] font-black uppercase tracking-[0.22em] text-white transition-all hover:scale-105 sm:px-10 sm:py-4 sm:text-[10px] sm:tracking-widest"
                     >
                       Explore user tools
                     </button>
@@ -710,7 +710,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => setExpandedCard('customer')}
-                    className="mt-8 rounded-full bg-tikibox-navy px-12 py-5 text-xs font-black uppercase tracking-widest text-white transition-all hover:scale-105"
+                    className="mt-6 rounded-full bg-tikibox-navy px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.22em] text-white transition-all hover:scale-105 sm:mt-8 sm:px-12 sm:py-5 sm:text-xs sm:tracking-widest"
                   >
                     Learn more
                   </button>
@@ -721,24 +721,24 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      <Section id="concept" className="bg-[#faf8f6] py-24">
-        <div className="mx-auto max-w-7xl px-6">
+      <Section id="concept" className="bg-[#faf8f6] py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="mb-16 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"
+            className="mb-12 flex flex-col gap-6 sm:mb-16 sm:gap-8 lg:flex-row lg:items-end lg:justify-between"
           >
             <motion.div variants={revealLeft}>
               <p className="mb-4 text-[10px] font-black uppercase tracking-[0.45em] text-tikibox-orange">Concept</p>
-              <h2 className="font-display text-4xl font-black uppercase leading-[0.92] tracking-tighter text-tikibox-navy md:text-6xl">
+              <h2 className="font-display text-3xl font-black uppercase leading-[0.94] tracking-tighter text-tikibox-navy sm:text-4xl md:text-6xl">
                 One commerce pulse,
                 <br />
                 three connected players.
               </h2>
             </motion.div>
-            <motion.p variants={revealRight} className="max-w-xl text-base font-medium leading-relaxed text-tikibox-navy/60">
+            <motion.p variants={revealRight} className="max-w-xl text-sm font-medium leading-relaxed text-tikibox-navy/60 sm:text-base">
               The system works because it is designed as an ecosystem, not a collection of screens. Buyers transact with confidence, merchants grow with clarity, and suppliers stay in sync with demand.
             </motion.p>
           </motion.div>
@@ -748,7 +748,7 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.15 }}
-            className="grid gap-6 md:grid-cols-3"
+            className="grid gap-4 sm:gap-6 md:grid-cols-3"
           >
             {[
               {
@@ -771,12 +771,12 @@ export default function LandingPage() {
                 key={item.title}
                 variants={revealUp}
                 whileHover={prefersReducedMotion ? undefined : { y: -8, scale: 1.01 }}
-                className="group rounded-[2rem] bg-white p-8 shadow-[0_20px_40px_rgba(35,35,62,0.06)] ring-1 ring-tikibox-navy/6"
+                className="group rounded-[1.5rem] bg-white p-6 shadow-[0_20px_40px_rgba(35,35,62,0.06)] ring-1 ring-tikibox-navy/6 sm:rounded-[2rem] sm:p-8"
               >
                 <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.08, rotate: -6 }} className="w-fit">
-                  <item.icon className="mb-6 h-8 w-8 text-tikibox-orange" />
+                  <item.icon className="mb-5 h-7 w-7 text-tikibox-orange sm:mb-6 sm:h-8 sm:w-8" />
                 </motion.div>
-                <h3 className="mb-4 font-display text-2xl font-black uppercase tracking-tight text-tikibox-navy">{item.title}</h3>
+                <h3 className="mb-3 font-display text-xl font-black uppercase tracking-tight text-tikibox-navy sm:mb-4 sm:text-2xl">{item.title}</h3>
                 <p className="text-sm font-medium leading-relaxed text-tikibox-navy/60">{item.body}</p>
               </motion.div>
             ))}
@@ -784,14 +784,14 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      <Section className="min-h-screen items-center bg-white py-20" id="individuals">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 md:grid-cols-[1fr_1.5fr_2fr] md:gap-16">
+      <Section className="min-h-screen items-center bg-white py-16 sm:py-20" id="individuals">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 sm:px-6 md:grid-cols-[1fr_1.5fr_2fr] md:gap-16">
           <div className="relative flex h-full flex-col justify-start pt-4">
-            <div className="flex flex-col gap-6">
-              <div className="text-4xl font-display font-black tracking-tighter text-tikibox-navy">
+            <div className="flex flex-col gap-4 sm:gap-6">
+              <div className="text-3xl font-display font-black tracking-tighter text-tikibox-navy sm:text-4xl">
                 TK<span className="inline-block text-tikibox-orange-gradient">BX</span>
               </div>
-              <div className="text-[10px] font-black uppercase leading-relaxed tracking-[0.4em] text-tikibox-navy/30">
+              <div className="text-[9px] font-black uppercase leading-relaxed tracking-[0.32em] text-tikibox-navy/30 sm:text-[10px] sm:tracking-[0.4em]">
                 Built for <br /> Financial <br /> Freedom
               </div>
             </div>
@@ -817,12 +817,12 @@ export default function LandingPage() {
             <PhoneSimulator videoSources={section3PhoneSources} videoTitle="Tik'iBox user payment demo on Android phone" />
           </motion.div>
 
-          <div className="space-y-16 md:space-y-20">
+          <div className="space-y-10 sm:space-y-16 md:space-y-20">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="max-w-4xl font-display text-4xl font-medium leading-[1.1] tracking-tight text-tikibox-navy md:text-5xl"
+              className="max-w-4xl font-display text-3xl font-medium leading-[1.12] tracking-tight text-tikibox-navy sm:text-4xl md:text-5xl"
             >
               Simplify your daily life and join thousands of users who trust Tik’iBox for their everyday payments.
             </motion.h2>
@@ -848,10 +848,10 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="grid gap-6 py-8 md:grid-cols-[1fr_1.5fr] md:gap-12 md:py-10"
+                  className="grid gap-4 py-6 sm:gap-6 sm:py-8 md:grid-cols-[1fr_1.5fr] md:gap-12 md:py-10"
                 >
-                  <h3 className="font-display text-lg font-black uppercase tracking-tight text-tikibox-navy">{item.title}</h3>
-                  <p className="text-base font-medium leading-relaxed text-tikibox-navy/60">{item.desc}</p>
+                  <h3 className="font-display text-base font-black uppercase tracking-tight text-tikibox-navy sm:text-lg">{item.title}</h3>
+                  <p className="text-sm font-medium leading-relaxed text-tikibox-navy/60 sm:text-base">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -865,14 +865,14 @@ export default function LandingPage() {
         />
       </Section>
 
-      <Section className="min-h-screen items-center bg-[#f8f9fa] py-20" id="merchants">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 md:grid-cols-[2fr_1.5fr_1fr] md:gap-16">
-          <div className="order-3 space-y-16 md:order-1 md:space-y-20">
+      <Section className="min-h-screen items-center bg-[#f8f9fa] py-16 sm:py-20" id="merchants">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 sm:px-6 md:grid-cols-[2fr_1.5fr_1fr] md:gap-16">
+          <div className="order-3 space-y-10 md:order-1 md:space-y-20">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="max-w-4xl font-display text-4xl font-medium leading-[1.1] tracking-tight text-tikibox-navy md:text-5xl"
+              className="max-w-4xl font-display text-3xl font-medium leading-[1.12] tracking-tight text-tikibox-navy sm:text-4xl md:text-5xl"
             >
               Transform your shop into a digital powerhouse with tools built for community growth.
             </motion.h2>
@@ -902,10 +902,10 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="grid gap-6 py-8 md:grid-cols-[1fr_1.5fr] md:gap-12 md:py-10"
+                  className="grid gap-4 py-6 sm:gap-6 sm:py-8 md:grid-cols-[1fr_1.5fr] md:gap-12 md:py-10"
                 >
-                  <h3 className="font-display text-lg font-black uppercase tracking-tight text-tikibox-navy">{item.title}</h3>
-                  <p className="text-base font-medium leading-relaxed text-tikibox-navy/60">{item.desc}</p>
+                  <h3 className="font-display text-base font-black uppercase tracking-tight text-tikibox-navy sm:text-lg">{item.title}</h3>
+                  <p className="text-sm font-medium leading-relaxed text-tikibox-navy/60 sm:text-base">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -916,11 +916,11 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="order-1 flex h-full flex-col items-end justify-start pt-4 text-right md:order-3">
-            <div className="flex flex-col gap-6">
-              <div className="text-4xl font-display font-black tracking-tighter text-tikibox-navy">
+            <div className="flex flex-col gap-4 sm:gap-6">
+              <div className="text-3xl font-display font-black tracking-tighter text-tikibox-navy sm:text-4xl">
                 TK<span className="inline-block text-tikibox-orange-gradient">BX</span>
               </div>
-              <div className="text-[10px] font-black uppercase leading-relaxed tracking-[0.4em] text-tikibox-navy/30">
+              <div className="text-[9px] font-black uppercase leading-relaxed tracking-[0.32em] text-tikibox-navy/30 sm:text-[10px] sm:tracking-[0.4em]">
                 Built for <br /> Financial <br /> Freedom
               </div>
             </div>
@@ -950,30 +950,30 @@ export default function LandingPage() {
         />
       </Section>
 
-      <Section id="suppliers" className="overflow-hidden bg-tikibox-navy py-24 text-white">
+      <Section id="suppliers" className="overflow-hidden bg-tikibox-navy py-20 text-white sm:py-24">
         <ParallaxText>supplier network</ParallaxText>
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.18 }}
-          className="relative mx-auto max-w-7xl px-6"
+          className="relative mx-auto max-w-7xl px-4 sm:px-6"
         >
-          <div className="mb-16 grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-end">
+          <div className="mb-12 grid gap-8 sm:mb-16 sm:gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-end">
             <motion.div variants={revealLeft}>
               <p className="mb-4 text-[10px] font-black uppercase tracking-[0.45em] text-tikibox-orange">Suppliers</p>
-              <h2 className="font-display text-4xl font-black uppercase leading-[0.92] tracking-tighter md:text-6xl">
+              <h2 className="font-display text-3xl font-black uppercase leading-[0.94] tracking-tighter sm:text-4xl md:text-6xl">
                 Keep shelves full
                 <br />
                 without slowing down.
               </h2>
             </motion.div>
-            <motion.p variants={revealRight} className="max-w-xl text-base font-medium leading-relaxed text-white/65">
+            <motion.p variants={revealRight} className="max-w-xl text-sm font-medium leading-relaxed text-white/65 sm:text-base">
               Suppliers become part of the same pulse. Shops know where stock is coming from, suppliers see cleaner demand signals, and the full network becomes more dependable.
             </motion.p>
           </div>
 
-          <motion.div variants={staggerContainer} className="grid gap-6 md:grid-cols-3">
+          <motion.div variants={staggerContainer} className="grid gap-4 sm:gap-6 md:grid-cols-3">
             {[
               {
                 icon: Truck,
@@ -995,12 +995,12 @@ export default function LandingPage() {
                 key={item.title}
                 variants={revealUp}
                 whileHover={prefersReducedMotion ? undefined : { y: -8, scale: 1.01 }}
-                className="group rounded-[2rem] border border-white/10 bg-white/5 p-8 backdrop-blur-sm"
+                className="group rounded-[1.5rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:rounded-[2rem] sm:p-8"
               >
                 <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.08, rotate: -6 }} className="w-fit">
-                  <item.icon className="mb-6 h-8 w-8 text-tikibox-orange" />
+                  <item.icon className="mb-5 h-7 w-7 text-tikibox-orange sm:mb-6 sm:h-8 sm:w-8" />
                 </motion.div>
-                <h3 className="mb-4 font-display text-2xl font-black uppercase tracking-tight">{item.title}</h3>
+                <h3 className="mb-3 font-display text-xl font-black uppercase tracking-tight sm:mb-4 sm:text-2xl">{item.title}</h3>
                 <p className="text-sm font-medium leading-relaxed text-white/70">{item.body}</p>
               </motion.div>
             ))}
@@ -1008,18 +1008,18 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
-      <Section id="resources" className="bg-white py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-16 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+      <Section id="resources" className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mb-12 flex flex-col gap-6 sm:mb-16 sm:gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="mb-4 text-[10px] font-black uppercase tracking-[0.45em] text-tikibox-orange">Resources</p>
-              <h2 className="font-display text-4xl font-black uppercase leading-[0.92] tracking-tighter text-tikibox-navy md:text-6xl">
+              <h2 className="font-display text-3xl font-black uppercase leading-[0.94] tracking-tighter text-tikibox-navy sm:text-4xl md:text-6xl">
                 The trust layer
                 <br />
                 behind the launch.
               </h2>
             </div>
-            <p className="max-w-xl text-base font-medium leading-relaxed text-tikibox-navy/60">
+            <p className="max-w-xl text-sm font-medium leading-relaxed text-tikibox-navy/60 sm:text-base">
               Beyond the visuals, the site should feel complete. These are the cues that tell people the experience is ready to be believed.
             </p>
           </div>
@@ -1029,7 +1029,7 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.15 }}
-            className="grid gap-6 md:grid-cols-4"
+            className="grid gap-4 sm:gap-6 md:grid-cols-4"
           >
             {[
               'Real-time transaction visibility',
@@ -1041,7 +1041,7 @@ export default function LandingPage() {
                 key={item}
                 variants={revealUp}
                 whileHover={prefersReducedMotion ? undefined : { y: -8, scale: 1.01 }}
-                className="rounded-[2rem] border border-tikibox-navy/8 bg-[#faf8f6] p-8 text-sm font-black uppercase leading-relaxed tracking-[0.22em] text-tikibox-navy"
+                className="rounded-[1.5rem] border border-tikibox-navy/8 bg-[#faf8f6] p-6 text-[11px] font-black uppercase leading-relaxed tracking-[0.18em] text-tikibox-navy sm:rounded-[2rem] sm:p-8 sm:text-sm sm:tracking-[0.22em]"
               >
                 {item}
               </motion.div>
@@ -1050,16 +1050,16 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      <Section id="contact" className="bg-[#faf8f6] py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="overflow-hidden rounded-[3rem] bg-tikibox-navy px-8 py-14 text-white shadow-[0_30px_60px_rgba(35,35,62,0.18)] md:px-14">
-            <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
+      <Section id="contact" className="bg-[#faf8f6] py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="overflow-hidden rounded-[2rem] bg-tikibox-navy px-6 py-10 text-white shadow-[0_30px_60px_rgba(35,35,62,0.18)] sm:rounded-[3rem] sm:px-8 sm:py-14 md:px-14">
+            <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1.3fr_1fr]">
               <div>
                 <p className="mb-4 text-[10px] font-black uppercase tracking-[0.45em] text-tikibox-orange">Contact</p>
-                <h2 className="max-w-3xl font-display text-4xl font-black uppercase leading-[0.92] tracking-tighter md:text-6xl">
+                <h2 className="max-w-3xl font-display text-3xl font-black uppercase leading-[0.94] tracking-tighter sm:text-4xl md:text-6xl">
                   Ready to shape the next version of community commerce?
                 </h2>
-                <p className="mt-6 max-w-2xl text-base font-medium leading-relaxed text-white/65">
+                <p className="mt-5 max-w-2xl text-sm font-medium leading-relaxed text-white/65 sm:mt-6 sm:text-base">
                   Use this landing page as the launch canvas. Everything now connects, and the next conversation is about which audience you want to activate first.
                 </p>
               </div>
@@ -1069,7 +1069,7 @@ export default function LandingPage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
               >
                 {[
                   { icon: PhoneCall, label: 'Start with user flow', href: '#individuals' },
@@ -1082,23 +1082,23 @@ export default function LandingPage() {
                     variants={revealUp}
                     href={item.href}
                     whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.01 }}
-                    className="group flex items-center justify-between rounded-[1.5rem] border border-white/10 bg-white/5 px-6 py-5 transition-all hover:bg-white/10"
+                    className="group flex items-center justify-between rounded-[1.25rem] border border-white/10 bg-white/5 px-4 py-4 transition-all hover:bg-white/10 sm:rounded-[1.5rem] sm:px-6 sm:py-5"
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       <motion.div whileHover={prefersReducedMotion ? undefined : { rotate: -8, scale: 1.05 }} className="w-fit">
-                        <item.icon className="h-5 w-5 text-tikibox-orange" />
+                        <item.icon className="h-4 w-4 text-tikibox-orange sm:h-5 sm:w-5" />
                       </motion.div>
-                      <span className="text-sm font-black uppercase tracking-[0.22em]">{item.label}</span>
+                      <span className="text-[11px] font-black uppercase tracking-[0.16em] sm:text-sm sm:tracking-[0.22em]">{item.label}</span>
                     </div>
                     <motion.div whileHover={prefersReducedMotion ? undefined : { x: 5 }} className="inline-flex">
-                      <ArrowRight className="h-5 w-5 text-white/60" />
+                      <ArrowRight className="h-4 w-4 text-white/60 sm:h-5 sm:w-5" />
                     </motion.div>
                   </motion.a>
                 ))}
               </motion.div>
             </div>
 
-            <div className="mt-12 flex flex-wrap gap-6 border-t border-white/10 pt-8 text-sm font-medium text-white/45">
+            <div className="mt-10 flex flex-wrap gap-4 border-t border-white/10 pt-6 text-xs font-medium text-white/45 sm:mt-12 sm:gap-6 sm:pt-8 sm:text-sm">
               <span className="inline-flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-tikibox-orange" />
                 Built for neighbourhood commerce
@@ -1112,17 +1112,17 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      <footer className="relative overflow-hidden bg-tikibox-light pb-0 pt-32">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-12 flex flex-wrap justify-center gap-x-12 gap-y-4">
+      <footer className="relative overflow-hidden bg-tikibox-light pb-0 pt-20 sm:pt-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mb-10 flex flex-wrap justify-center gap-x-8 gap-y-3 sm:mb-12 sm:gap-x-12 sm:gap-y-4">
             {footerLinks.map((link) => (
-              <a key={link.label} href={link.href} className="text-base font-bold text-tikibox-navy transition-colors hover:text-tikibox-orange">
+              <a key={link.label} href={link.href} className="text-sm font-bold text-tikibox-navy transition-colors hover:text-tikibox-orange sm:text-base">
                 {link.label}
               </a>
             ))}
           </div>
 
-          <div className="mb-32 flex flex-wrap items-center justify-center gap-x-12 gap-y-4 text-sm font-medium text-tikibox-navy/60">
+          <div className="mb-20 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-tikibox-navy/60 sm:mb-32 sm:gap-x-12 sm:gap-y-4 sm:text-sm">
             <p>© 2026 Tik’iBox, all rights reserved.</p>
             <span>Launch narrative</span>
             <span>Community-first commerce</span>
@@ -1134,26 +1134,26 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          className="pointer-events-none relative flex w-full translate-y-[35%] select-none flex-col items-center"
+          className="pointer-events-none relative flex w-full translate-y-[42%] select-none flex-col items-center sm:translate-y-[35%]"
         >
           <motion.div
             animate={prefersReducedMotion ? undefined : { y: [0, -8, 0] }}
             transition={prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="mb-[-4vw] flex gap-[10vw]"
+            className="mb-[-2vw] flex gap-[7vw] sm:mb-[-4vw] sm:gap-[10vw]"
           >
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <motion.div
                 key={i}
                 animate={prefersReducedMotion ? undefined : { y: [0, i % 2 === 0 ? -8 : 8, 0], scale: [1, 1.03, 1] }}
                 transition={prefersReducedMotion ? undefined : { duration: 4 + i * 0.35, repeat: Infinity, ease: 'easeInOut' }}
-                className="h-[10vw] w-[10vw] rounded-full bg-tikibox-navy"
+                className="h-[12vw] w-[12vw] rounded-full bg-tikibox-navy sm:h-[10vw] sm:w-[10vw]"
               />
             ))}
           </motion.div>
           <motion.h2
             animate={prefersReducedMotion ? undefined : { y: [0, -6, 0] }}
             transition={prefersReducedMotion ? undefined : { duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-            className="whitespace-nowrap font-display text-[28vw] font-black uppercase leading-none tracking-tighter text-tikibox-navy"
+            className="whitespace-nowrap font-display text-[36vw] font-black uppercase leading-none tracking-tighter text-tikibox-navy sm:text-[28vw]"
           >
             Tik’iBox
           </motion.h2>

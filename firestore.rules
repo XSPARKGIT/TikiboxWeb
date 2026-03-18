@@ -1,0 +1,143 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {uid}
+    // Fields:
+    //   - uid: string (required, immutable)
+    //   - phoneNumber: string (required, unique-ish)
+    //   - displayName: string (required)
+    //   - role: string (required, enum: user, merchant, admin, super_admin, supplier)
+    //   - balance: number (required, non-negative)
+    //   - pin: string (required, 4-6 digits)
+    //   - isMerchantApproved: boolean (required)
+    //   - createdAt: timestamp (required, immutable)
+    //
+    // Collection: transactions
+    // Document ID: {transactionId}
+    // Fields:
+    //   - fromUid: string (required)
+    //   - toUid: string (required)
+    //   - amount: number (required, positive)
+    //   - type: string (required, enum: transfer, topup, withdrawal, payment, order)
+    //   - status: string (required, enum: pending, success, failed)
+    //   - timestamp: timestamp (required, immutable)
+    //   - description: string (optional)
+    //
+    // Collection: products
+    // Document ID: {productId}
+    // Fields:
+    //   - supplierId: string (required)
+    //   - name: string (required)
+    //   - price: number (required, positive)
+    //   - stock: number (required, non-negative)
+    //   - category: string (optional)
+    //   - imageUrl: string (optional)
+    //
+    // Collection: orders
+    // Document ID: {orderId}
+    // Fields:
+    //   - merchantId: string (required)
+    //   - supplierId: string (required)
+    //   - items: list (required)
+    //   - totalAmount: number (required, positive)
+    //   - status: string (required, enum: pending, processing, shipped, delivered, cancelled)
+    //   - timestamp: timestamp (required, immutable)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'] ||
+          (request.auth.token.email == "apps.xspark@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin' ||
+          (request.auth.token.email == "apps.xspark@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'phoneNumber', 'displayName', 'role', 'balance', 'pin', 'isMerchantApproved']) &&
+             data.uid is string &&
+             data.phoneNumber is string &&
+             data.displayName is string &&
+             data.displayName.size() > 0 && data.displayName.size() < 100 &&
+             data.role in ['user', 'merchant', 'admin', 'super_admin', 'supplier'] &&
+             data.balance is number && data.balance >= 0 &&
+             data.pin is string && data.pin.size() >= 4 && data.pin.size() <= 6 &&
+             data.isMerchantApproved is bool;
+    }
+
+    function isValidTransaction(data) {
+      return data.keys().hasAll(['fromUid', 'toUid', 'amount', 'type', 'status', 'timestamp']) &&
+             data.fromUid is string &&
+             data.toUid is string &&
+             data.amount is number && data.amount > 0 &&
+             data.type in ['transfer', 'topup', 'withdrawal', 'payment', 'order'] &&
+             data.status in ['pending', 'success', 'failed'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && 
+                      isValidUser(request.resource.data) && 
+                      request.resource.data.uid == request.auth.uid &&
+                      request.resource.data.role == 'user' && // Default role
+                      request.resource.data.balance <= 100; // Max initial balance
+      allow update: if isAuthenticated() && 
+                      isValidUser(request.resource.data) && 
+                      (
+                        (isOwner(userId) && 
+                         request.resource.data.role == resource.data.role && // Cannot change own role
+                         request.resource.data.balance == resource.data.balance // Cannot change own balance directly
+                        ) || 
+                        isAdmin()
+                      );
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid || isAdmin());
+      allow create: if false; // Transactions must be handled by server-side logic for atomicity
+    }
+
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'supplier' || isAdmin());
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (resource.data.merchantId == request.auth.uid || resource.data.supplierId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'merchant';
+      allow update: if isAuthenticated() && (resource.data.merchantId == request.auth.uid || resource.data.supplierId == request.auth.uid || isAdmin());
+    }
+
+    match /merchant_applications/{appId} {
+      allow read: if isAuthenticated() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+      allow update: if isAdmin();
+    }
+  }
+}

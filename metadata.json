@@ -1,0 +1,8 @@
+{
+  "name": "Tik’iBox Wallet",
+  "description": "A comprehensive digital wallet and merchant ecosystem for individual users, spaza shops, and suppliers.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}

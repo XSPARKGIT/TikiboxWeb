@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Represents a platform user (Individual, Merchant, Admin, etc.)",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "phoneNumber": { "type": "string", "description": "User's cellphone number" },
+        "displayName": { "type": "string", "description": "User's full name or shop name" },
+        "role": { "type": "string", "enum": ["user", "merchant", "admin", "super_admin", "supplier"], "description": "User's role on the platform" },
+        "balance": { "type": "number", "description": "Current wallet balance" },
+        "pin": { "type": "string", "description": "4-digit security PIN" },
+        "isMerchantApproved": { "type": "boolean", "description": "Whether the merchant application is approved" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "phoneNumber", "role", "balance"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Represents a financial movement between wallets",
+      "type": "object",
+      "properties": {
+        "fromUid": { "type": "string" },
+        "toUid": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["transfer", "topup", "withdrawal", "payment", "order"] },
+        "status": { "type": "string", "enum": ["pending", "success", "failed"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "description": { "type": "string" }
+      },
+      "required": ["fromUid", "toUid", "amount", "type", "status", "timestamp"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Merchandise available for merchants to order",
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "stock": { "type": "number" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["supplierId", "name", "price", "stock"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "An order placed by a merchant to a supplier",
+      "type": "object",
+      "properties": {
+        "merchantId": { "type": "string" },
+        "supplierId": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "name": { "type": "string" },
+              "quantity": { "type": "number" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "processing", "shipped", "delivered", "cancelled"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["merchantId", "supplierId", "items", "totalAmount", "status", "timestamp"]
+    },
+    "MerchantApplication": {
+      "title": "Merchant Application",
+      "description": "Application for a user to become a merchant",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "shopName": { "type": "string" },
+        "location": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "shopName", "status", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": { "schema": "User", "description": "User profiles and wallet balances" },
+    "/transactions/{transactionId}": { "schema": "Transaction", "description": "History of all wallet movements" },
+    "/products/{productId}": { "schema": "Product", "description": "Supplier product catalog" },
+    "/orders/{orderId}": { "schema": "Order", "description": "Merchant stock orders" },
+    "/merchant_applications/{appId}": { "schema": "MerchantApplication", "description": "Applications for merchant status" }
+  }
+}

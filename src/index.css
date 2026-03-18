@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-tikibox-navy: #23233E;
+  --color-tikibox-orange: #E1732B;
+  --color-tikibox-light: #F8F9FA;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-sans text-tikibox-navy antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+.glass {
+  @apply bg-white/40 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] ring-1 ring-white/20;
+}
+
+.glass-dark {
+  @apply bg-tikibox-navy/60 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] ring-1 ring-white/5;
+}
+
+@layer utilities {
+  .bg-tikibox-orange-gradient {
+    background-image: radial-gradient(circle at 20% 20%, #E1732B 0%, #B93131 55%, #E57020 100%);
+  }
+  .text-tikibox-orange-gradient {
+    background-image: radial-gradient(circle at 20% 20%, #E1732B 0%, #B93131 55%, #E57020 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}

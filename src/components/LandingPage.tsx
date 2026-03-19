@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -25,6 +25,31 @@ import merchantLaptopVideo from '@/assets/Merchant WebDashboardWalkthrough.mov';
 type VideoSource = {
   src: string;
   type: string;
+};
+
+const useIsMobileViewport = () => {
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+
+    updateViewport();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', updateViewport);
+      return () => mediaQuery.removeEventListener('change', updateViewport);
+    }
+
+    mediaQuery.addListener(updateViewport);
+    return () => mediaQuery.removeListener(updateViewport);
+  }, []);
+
+  return isMobileViewport;
 };
 
 const revealUp = {
@@ -77,21 +102,90 @@ const AmbientVideo = ({
   title: string;
   objectFit?: 'object-cover' | 'object-contain';
   className?: string;
-}) => (
-  <video
-    aria-label={title}
-    autoPlay
-    muted
-    loop
-    playsInline
-    preload="metadata"
-    className={`h-full w-full ${objectFit} ${className}`}
-  >
-    {sources.map((source) => (
-      <source key={source.src} src={source.src} type={source.type} />
-    ))}
-  </video>
-);
+}) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) {
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const tryPlay = async () => {
+      if (isCancelled) {
+        return;
+      }
+
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+
+      try {
+        await video.play();
+      } catch {
+        // Mobile browsers can reject autoplay transiently; retry via visibility/media events.
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        void tryPlay();
+      }
+    };
+
+    const handleCanPlay = () => {
+      void tryPlay();
+    };
+
+    const observer =
+      typeof IntersectionObserver === 'undefined'
+        ? null
+        : new IntersectionObserver(
+            (entries) => {
+              if (entries.some((entry) => entry.isIntersecting)) {
+                void tryPlay();
+              }
+            },
+            { threshold: 0.35 }
+          );
+
+    observer?.observe(video);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    video.addEventListener('loadedmetadata', handleCanPlay);
+    video.addEventListener('canplay', handleCanPlay);
+
+    void tryPlay();
+
+    return () => {
+      isCancelled = true;
+      observer?.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      video.removeEventListener('loadedmetadata', handleCanPlay);
+      video.removeEventListener('canplay', handleCanPlay);
+    };
+  }, [sources]);
+
+  return (
+    <video
+      ref={videoRef}
+      aria-label={title}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      disablePictureInPicture
+      controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
+      className={`h-full w-full ${objectFit} ${className}`}
+    >
+      {sources.map((source) => (
+        <source key={source.src} src={source.src} type={source.type} />
+      ))}
+    </video>
+  );
+};
 
 const PhoneSimulator = ({
   videoSources,
@@ -186,6 +280,7 @@ const LaptopAnimation = ({
 }) => {
   const containerRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
+  const isMobileViewport = useIsMobileViewport();
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
@@ -194,20 +289,21 @@ const LaptopAnimation = ({
   const rotateX = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [-105, 0, 0, -105]);
   const opacity = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
   const captionY = useTransform(scrollYProgress, [0, 0.5, 1], [18, 0, -12]);
+  const useFlatShell = prefersReducedMotion || isMobileViewport;
 
   return (
     <div ref={containerRef} className="mt-16 flex w-full flex-col items-center justify-center sm:mt-24">
       <motion.div
         style={{ opacity }}
-        animate={prefersReducedMotion ? undefined : { y: [0, -4, 0] }}
-        transition={prefersReducedMotion ? undefined : { duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative aspect-[16/10] w-full max-w-[520px] [perspective:2000px] sm:max-w-[600px]"
+        animate={useFlatShell ? undefined : { y: [0, -4, 0] }}
+        transition={useFlatShell ? undefined : { duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
+        className="relative aspect-[16/10] w-full max-w-[520px] sm:max-w-[600px] sm:[perspective:2000px]"
       >
         <motion.div
           style={{
-            rotateX,
+            rotateX: useFlatShell ? 0 : rotateX,
             transformOrigin: 'bottom',
-            transformStyle: 'preserve-3d',
+            transformStyle: useFlatShell ? 'flat' : 'preserve-3d',
           }}
           className="absolute bottom-[8%] left-[5%] right-[5%] z-20 h-[85%] overflow-hidden rounded-t-xl border-[4px] border-tikibox-navy/20 bg-tikibox-navy shadow-2xl"
         >
@@ -226,8 +322,8 @@ const LaptopAnimation = ({
                 className="bg-[#0f1015]"
               />
               <motion.div
-                animate={prefersReducedMotion ? undefined : { x: ['-120%', '140%'] }}
-                transition={prefersReducedMotion ? undefined : { duration: 5.5, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2.4 }}
+                animate={useFlatShell ? undefined : { x: ['-120%', '140%'] }}
+                transition={useFlatShell ? undefined : { duration: 5.5, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2.4 }}
                 className="pointer-events-none absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/8 to-transparent blur-md"
               />
             </div>
@@ -239,7 +335,7 @@ const LaptopAnimation = ({
         </div>
       </motion.div>
 
-      <motion.p style={{ opacity, y: captionY }} className="mt-6 text-[7px] font-black uppercase tracking-[0.32em] text-tikibox-navy/20 sm:mt-8 sm:text-[8px] sm:tracking-[0.4em]">
+      <motion.p style={{ opacity, y: useFlatShell ? 0 : captionY }} className="mt-6 text-[7px] font-black uppercase tracking-[0.32em] text-tikibox-navy/20 sm:mt-8 sm:text-[8px] sm:tracking-[0.4em]">
         {caption}
       </motion.p>
     </div>
@@ -269,7 +365,10 @@ const footerLinks = [
 
 export default function LandingPage() {
   const [expandedCard, setExpandedCard] = useState<'merchant' | 'customer' | null>('merchant');
+  const [showFloatingTop, setShowFloatingTop] = useState(false);
+  const [activeFooterCircle, setActiveFooterCircle] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const footerCircleRefs = useRef<Array<HTMLDivElement | null>>([]);
   const prefersReducedMotion = useReducedMotion();
 
   const section3PhoneSources = [{ src: individualsPhoneVideo, type: 'video/mp4' }];
@@ -300,13 +399,73 @@ export default function LandingPage() {
   const heroRightDrift = useTransform(smoothProgress, [0, 0.25], [0, 18]);
   const heroBadgeY = useTransform(smoothProgress, [0, 0.2], [0, -10]);
 
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', (value) => {
+      setShowFloatingTop(value > 0.12);
+    });
+
+    return unsubscribe;
+  }, [scrollYProgress]);
+
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleFooterPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    const pointerX = event.clientX;
+    let nearestIndex: number | null = null;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    footerCircleRefs.current.forEach((circle, index) => {
+      if (!circle) {
+        return;
+      }
+
+      const rect = circle.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const distance = Math.abs(pointerX - centerX);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    setActiveFooterCircle(nearestIndex);
+  };
+
+  const resetFooterPointer = () => {
+    setActiveFooterCircle(null);
   };
 
   return (
     <div id="top" ref={containerRef} className="overflow-x-hidden bg-white text-tikibox-navy selection:bg-tikibox-orange selection:text-white">
       <motion.div className="fixed left-0 right-0 top-0 z-50 h-1 origin-left bg-tikibox-orange-gradient" style={{ scaleX: smoothProgress }} />
+      <motion.button
+        type="button"
+        onClick={() => scrollToSection('top')}
+        initial={false}
+        animate={
+          showFloatingTop
+            ? { opacity: 1, y: 0, scale: 1 }
+            : { opacity: 0, y: 16, scale: 0.92 }
+        }
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        whileHover={prefersReducedMotion ? undefined : { y: -3, scale: 1.03 }}
+        whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
+        className="fixed bottom-5 right-4 z-50 flex items-center gap-2 rounded-full border border-transparent bg-tikibox-orange-gradient px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-[#1a1a2e] shadow-[0_18px_40px_rgba(229,112,32,0.28)] sm:bottom-8 sm:right-6"
+        style={{ pointerEvents: showFloatingTop ? 'auto' : 'none' }}
+        aria-label="Back to top"
+      >
+        <span className="inline-flex -rotate-90">
+          <ArrowRight className="h-4 w-4" />
+        </span>
+        Top
+      </motion.button>
 
       <Section className="min-h-screen justify-between overflow-hidden bg-[#1a1a2e] !pt-3 text-white sm:!pt-4">
         <motion.div
@@ -372,21 +531,21 @@ export default function LandingPage() {
             Launch with confidence
           </motion.p>
 
-          <motion.h1 variants={revealUp} className="mb-3 text-center font-display text-[2.65rem] font-black uppercase leading-[0.88] tracking-tighter sm:mb-2 sm:text-5xl md:text-7xl lg:text-8xl">
+          <motion.h1 variants={revealUp} className="mb-3 text-center font-display text-[2.25rem] font-black uppercase leading-[0.9] tracking-tighter sm:mb-2 sm:text-4xl md:text-6xl lg:text-7xl">
             The Pulse of <br />
             Community Commerce
           </motion.h1>
 
           <motion.div
             variants={revealUp}
-            className="relative mb-10 inline-block overflow-hidden bg-tikibox-orange-gradient px-6 py-3.5 sm:mb-12 sm:px-10 sm:py-5"
+            className="relative mb-10 inline-block overflow-hidden bg-tikibox-orange-gradient px-5 py-3 sm:mb-12 sm:px-8 sm:py-4 md:px-10 md:py-5"
           >
             <motion.div
               animate={prefersReducedMotion ? undefined : { x: ['-120%', '130%'] }}
               transition={prefersReducedMotion ? undefined : { duration: 3.8, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.3 }}
               className="pointer-events-none absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-60"
             />
-            <span className="text-center font-display text-2xl font-black uppercase tracking-tighter text-[#1a1a2e] sm:text-3xl md:text-5xl lg:text-6xl">
+            <span className="text-center font-display text-xl font-black uppercase tracking-tighter text-[#1a1a2e] sm:text-[1.65rem] md:text-4xl lg:text-5xl">
               Without the Friction
             </span>
           </motion.div>
@@ -464,7 +623,7 @@ export default function LandingPage() {
             <motion.div
               animate={prefersReducedMotion ? undefined : { y: [0, -3, 0] }}
               transition={prefersReducedMotion ? undefined : { duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute left-[22%] top-[24%] rounded-full border border-white/10 bg-[#1f2142]/90 px-5 py-2 text-[10px] font-black uppercase tracking-[0.35em] text-white/70"
+              className="absolute left-[12%] top-[20%] rounded-full border border-white/12 bg-[#1f2142]/92 px-6 py-2.5 text-[11px] font-black uppercase tracking-[0.28em] text-white/82 shadow-[0_12px_28px_rgba(0,0,0,0.2)]"
             >
               Neighbourhood Shop
             </motion.div>
@@ -528,14 +687,14 @@ export default function LandingPage() {
             <img
               src={manOnPhone}
               alt="Man looking at his phone ready to make a payment"
-              className="relative z-10 h-auto w-full object-contain drop-shadow-[0_28px_40px_rgba(0,0,0,0.55)]"
+              className="relative z-10 h-auto w-full translate-x-[2%] object-contain drop-shadow-[0_28px_40px_rgba(0,0,0,0.55)]"
             />
             <motion.div
               animate={prefersReducedMotion ? undefined : { y: [0, -4, 0] }}
               transition={prefersReducedMotion ? undefined : { duration: 3.3, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute right-[7%] top-[24%] rounded-full border border-white/10 bg-[#1f2142]/90 px-4 py-2 text-[10px] font-black uppercase tracking-[0.35em] text-white/70"
+              className="absolute right-[7%] top-[17%] z-0 rounded-[1.5rem] border border-white/12 bg-[#1f2142]/90 px-7 py-3 text-[11px] font-black uppercase tracking-[0.16em] text-white/88 shadow-[0_12px_28px_rgba(0,0,0,0.24)]"
             >
-              Payment Ready
+              <span className="block whitespace-nowrap">Payment Ready</span>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -615,11 +774,11 @@ export default function LandingPage() {
             Whether you are buying, paying, stocking, or growing, Tik’iBox is designed to meet you exactly where the money moves.
           </p>
 
-          <div className="grid items-start gap-5 sm:gap-8 md:grid-cols-2">
+          <div className="grid items-start gap-5 sm:gap-8 md:grid-cols-2 md:auto-rows-fr">
             <motion.div
               layout
               whileHover={prefersReducedMotion ? undefined : { y: -10 }}
-              className="group relative min-h-[420px] overflow-hidden rounded-[2rem] bg-tikibox-navy p-7 text-center shadow-2xl sm:min-h-[500px] sm:rounded-[40px] sm:p-12"
+              className="group relative flex h-full min-h-[420px] flex-col overflow-hidden rounded-[2rem] bg-tikibox-navy p-7 text-center shadow-2xl sm:min-h-[500px] sm:rounded-[40px] sm:p-12"
             >
               <motion.div
                 animate={prefersReducedMotion ? undefined : { scale: [1, 1.18, 1], opacity: [0.18, 0.34, 0.18] }}
@@ -641,10 +800,10 @@ export default function LandingPage() {
                 </h3>
               </div>
 
-              <motion.div layout className="relative z-10 w-full">
+              <motion.div layout className="relative z-10 mt-auto w-full">
                 {expandedCard === 'merchant' ? (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-6 space-y-5 sm:mt-8 sm:space-y-6">
-                    <p className="text-sm leading-relaxed text-white/70">
+                    <p className="text-[13px] leading-relaxed text-white/68 sm:text-sm">
                       Accept digital payments instantly, understand your sales at a glance, and stay stocked with supplier access built directly into the experience.
                     </p>
                     <button
@@ -670,7 +829,7 @@ export default function LandingPage() {
             <motion.div
               layout
               whileHover={prefersReducedMotion ? undefined : { y: -10 }}
-              className="group relative min-h-[420px] overflow-hidden rounded-[2rem] bg-tikibox-orange-gradient p-7 text-center shadow-2xl sm:min-h-[500px] sm:rounded-[40px] sm:p-12"
+              className="group relative flex h-full min-h-[420px] flex-col overflow-hidden rounded-[2rem] bg-tikibox-orange-gradient p-7 text-center shadow-2xl sm:min-h-[500px] sm:rounded-[40px] sm:p-12"
             >
               <motion.div
                 animate={prefersReducedMotion ? undefined : { scale: [1, 1.18, 1], opacity: [0.16, 0.28, 0.16] }}
@@ -685,17 +844,17 @@ export default function LandingPage() {
 
               <div className="relative z-10 space-y-4">
                 <p className="text-xs font-black uppercase tracking-[0.3em] text-tikibox-navy">Joining as a Customer</p>
-                <h3 className="font-display text-2xl font-black uppercase leading-tight tracking-tighter text-tikibox-navy sm:text-3xl md:text-4xl">
+                <h3 className="font-display text-[1.7rem] font-black uppercase leading-tight tracking-tighter text-tikibox-navy sm:text-[2rem] md:text-[2.35rem]">
                   Want a smarter
                   <br />
                   way to pay?
                 </h3>
               </div>
 
-              <motion.div layout className="relative z-10 w-full">
+              <motion.div layout className="relative z-10 mt-auto w-full">
                 {expandedCard === 'customer' ? (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-6 space-y-5 sm:mt-8 sm:space-y-6">
-                    <p className="text-sm leading-relaxed text-tikibox-navy/70">
+                    <p className="text-[13px] leading-relaxed text-tikibox-navy/70 sm:text-sm">
                       Pay with confidence, move money instantly, and keep every transaction visible in one simple interface designed for daily life.
                     </p>
                     <button
@@ -1122,7 +1281,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="mb-20 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-tikibox-navy/60 sm:mb-32 sm:gap-x-12 sm:gap-y-4 sm:text-sm">
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-tikibox-navy/60 sm:mb-32 sm:gap-x-12 sm:gap-y-4 sm:text-sm">
             <p>© 2026 Tik’iBox, all rights reserved.</p>
             <span>Launch narrative</span>
             <span>Community-first commerce</span>
@@ -1130,34 +1289,55 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          className="pointer-events-none relative flex w-full translate-y-[42%] select-none flex-col items-center sm:translate-y-[35%]"
-        >
+        <div className="relative h-[8.5rem] overflow-hidden sm:h-auto">
           <motion.div
-            animate={prefersReducedMotion ? undefined : { y: [0, -8, 0] }}
-            transition={prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="mb-[-2vw] flex gap-[7vw] sm:mb-[-4vw] sm:gap-[10vw]"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            className="absolute inset-x-0 bottom-[-3.9rem] flex select-none flex-col items-center sm:static sm:translate-y-[35%]"
           >
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <motion.div
-                key={i}
-                animate={prefersReducedMotion ? undefined : { y: [0, i % 2 === 0 ? -8 : 8, 0], scale: [1, 1.03, 1] }}
-                transition={prefersReducedMotion ? undefined : { duration: 4 + i * 0.35, repeat: Infinity, ease: 'easeInOut' }}
-                className="h-[12vw] w-[12vw] rounded-full bg-tikibox-navy sm:h-[10vw] sm:w-[10vw]"
-              />
-            ))}
+            <motion.div
+              onPointerMove={handleFooterPointerMove}
+              onPointerLeave={resetFooterPointer}
+              animate={prefersReducedMotion ? undefined : { y: [0, -8, 0] }}
+              transition={prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+              className="mb-2 flex gap-[7vw] pointer-events-auto sm:mb-[-4vw] sm:gap-[10vw]"
+            >
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <motion.div
+                  key={i}
+                  ref={(node) => {
+                    footerCircleRefs.current[i - 1] = node;
+                  }}
+                  animate={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y:
+                            activeFooterCircle === null
+                              ? 0
+                              : activeFooterCircle === i - 1
+                                ? -28
+                                : Math.abs(activeFooterCircle - (i - 1)) === 1
+                                  ? 14
+                                  : 0,
+                          scale: activeFooterCircle === i - 1 ? 1.12 : activeFooterCircle === null ? 1 : 0.98,
+                        }
+                  }
+                  transition={prefersReducedMotion ? undefined : { type: 'spring', stiffness: 260, damping: 18, mass: 0.8 }}
+                  className="h-[12vw] w-[12vw] rounded-full bg-tikibox-navy sm:h-[10vw] sm:w-[10vw]"
+                />
+              ))}
+            </motion.div>
+            <motion.h2
+              animate={prefersReducedMotion ? undefined : { y: [0, -6, 0] }}
+              transition={prefersReducedMotion ? undefined : { duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              className="pointer-events-none whitespace-nowrap font-display text-[36vw] font-black uppercase leading-none tracking-tighter text-tikibox-navy sm:text-[28vw]"
+            >
+              Tik’iBox
+            </motion.h2>
           </motion.div>
-          <motion.h2
-            animate={prefersReducedMotion ? undefined : { y: [0, -6, 0] }}
-            transition={prefersReducedMotion ? undefined : { duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-            className="whitespace-nowrap font-display text-[36vw] font-black uppercase leading-none tracking-tighter text-tikibox-navy sm:text-[28vw]"
-          >
-            Tik’iBox
-          </motion.h2>
-        </motion.div>
+        </div>
       </footer>
     </div>
   );

@@ -13,6 +13,7 @@ import {
   Truck,
   Wallet,
 } from 'lucide-react';
+import navLogo from '@/assets/logo.png';
 import womanStanding from '@/assets/Womanstanding.png';
 import manOnPhone from '@/assets/Manonphone.png';
 import individualsPhoneVideo from '@/assets/2026-03-18 12.31.21.mp4';
@@ -297,7 +298,7 @@ const LaptopAnimation = ({
         style={{ opacity }}
         animate={useFlatShell ? undefined : { y: [0, -4, 0] }}
         transition={useFlatShell ? undefined : { duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative aspect-[16/10] w-full max-w-[520px] sm:max-w-[600px] sm:[perspective:2000px]"
+        className="relative aspect-[16/10] w-full max-w-[520px] sm:max-w-[680px] lg:max-w-[1120px] xl:max-w-[1280px] sm:[perspective:2000px]"
       >
         <motion.div
           style={{
@@ -392,7 +393,7 @@ export default function LandingPage() {
     damping: 30,
     restDelta: 0.001,
   });
-  const navOverlayOpacity = useTransform(smoothProgress, [0, 0.03, 0.08], [0, 0.35, 1]);
+  const navOverlayOpacity = useTransform(smoothProgress, [0, 0.03, 0.08], [0, 0.24, 0.62]);
   const heroGlowY = useTransform(smoothProgress, [0, 0.25], [0, -28]);
   const heroGlowScale = useTransform(smoothProgress, [0, 0.25], [1, 1.08]);
   const heroLeftDrift = useTransform(smoothProgress, [0, 0.25], [0, -22]);
@@ -474,18 +475,18 @@ export default function LandingPage() {
         />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/40 to-transparent" />
 
-        <nav className="relative z-30 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
+        <nav className="fixed left-1/2 top-3 z-40 flex w-[calc(100%-1.5rem)] max-w-7xl -translate-x-1/2 items-center justify-between px-4 py-6 sm:top-4 sm:w-[calc(100%-3rem)] sm:px-6 sm:py-7">
           <motion.div
             style={{ opacity: navOverlayOpacity }}
-            className="pointer-events-none absolute inset-0 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
+            className="pointer-events-none absolute inset-0 rounded-full border border-white/12 bg-[#16162b]/60 shadow-[0_18px_50px_rgba(6,8,20,0.35)] backdrop-blur-2xl"
           />
-          <div className="hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-white/40 md:flex">
+          <div className={`relative z-20 hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] md:flex ${showFloatingTop ? 'text-white/88' : 'text-white/68'}`}>
             {navLinks.map((link) => (
               <motion.a
                 key={link.label}
                 href={link.href}
                 whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-                className="relative transition-colors hover:text-tikibox-orange"
+                className="relative transition-colors duration-200 hover:text-tikibox-orange"
               >
                 {link.label}
               </motion.a>
@@ -495,25 +496,24 @@ export default function LandingPage() {
           <motion.a
             href="#top"
             whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.02 }}
-            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2 sm:gap-3"
+            className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-[40%]"
           >
-            <motion.div
-              animate={prefersReducedMotion ? undefined : { boxShadow: ['0 8px 20px rgba(225,115,43,0.12)', '0 16px 30px rgba(225,115,43,0.28)', '0 8px 20px rgba(225,115,43,0.12)'] }}
+            <motion.img
+              src={navLogo}
+              alt="Tik'iBox logo"
+              animate={prefersReducedMotion ? undefined : { y: [0, -2, 0] }}
               transition={prefersReducedMotion ? undefined : { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-tikibox-orange-gradient shadow-lg shadow-tikibox-orange/20 sm:h-10 sm:w-10"
-            >
-              <Wallet className="h-5 w-5 text-tikibox-navy sm:h-6 sm:w-6" />
-            </motion.div>
-            <span className="font-display text-xl font-black uppercase tracking-tighter sm:text-2xl">Tik’iBox</span>
+              className="h-48 w-auto object-contain sm:h-56 lg:h-64"
+            />
           </motion.a>
 
-          <div className="hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-white/40 md:flex">
+          <div className={`relative z-20 hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] md:flex ${showFloatingTop ? 'text-white/88' : 'text-white/68'}`}>
             {heroLinks.map((link) => (
               <motion.a
                 key={link.label}
                 href={link.href}
                 whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-                className="transition-colors hover:text-tikibox-orange"
+                className="transition-colors duration-200 hover:text-tikibox-orange"
               >
                 {link.label}
               </motion.a>

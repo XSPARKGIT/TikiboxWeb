@@ -470,6 +470,7 @@ export default function LandingPage() {
     restDelta: 0.001,
   });
   const navOverlayOpacity = useTransform(smoothProgress, [0, 0.03, 0.08], [0, 0.24, 0.62]);
+  const navTextColor = useTransform(smoothProgress, [0, 0.08, 0.14, 0.22], ['rgba(255,255,255,0.72)', 'rgba(255,255,255,0.88)', 'rgba(35,35,62,0.74)', 'rgba(35,35,62,0.92)']);
   const heroGlowY = useTransform(smoothProgress, [0, 0.25], [0, -28]);
   const heroGlowScale = useTransform(smoothProgress, [0, 0.25], [1, 1.08]);
   const heroLeftDrift = useTransform(smoothProgress, [0, 0.25], [0, -22]);
@@ -586,9 +587,9 @@ export default function LandingPage() {
         <nav className={`fixed left-1/2 top-3 z-40 flex w-[calc(100%-1.5rem)] max-w-7xl -translate-x-1/2 items-center justify-between px-4 py-6 transition-opacity duration-300 sm:top-4 sm:w-[calc(100%-3rem)] sm:px-6 sm:py-7 ${hideFloatingNav ? 'pointer-events-none opacity-0' : 'opacity-100'}`}>
           <motion.div
             style={{ opacity: navOverlayOpacity }}
-            className="pointer-events-none absolute inset-0 rounded-full border border-white/12 bg-[#16162b]/60 shadow-[0_18px_50px_rgba(6,8,20,0.35)] backdrop-blur-2xl"
+            className="pointer-events-none absolute inset-0 rounded-full border border-white/14 bg-white/4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-[36px]"
           />
-          <div className={`relative z-20 hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] md:flex ${showFloatingTop ? 'text-white/88' : 'text-white/68'}`}>
+          <motion.div style={{ color: navTextColor }} className="relative z-20 hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] md:flex">
             {navLinks.map((link) => (
               <motion.a
                 key={link.label}
@@ -599,7 +600,7 @@ export default function LandingPage() {
                 {link.label}
               </motion.a>
             ))}
-          </div>
+          </motion.div>
 
           <motion.a
             href="#top"
@@ -615,7 +616,7 @@ export default function LandingPage() {
             />
           </motion.a>
 
-          <div className={`relative z-20 hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] md:flex ${showFloatingTop ? 'text-white/88' : 'text-white/68'}`}>
+          <motion.div style={{ color: navTextColor }} className="relative z-20 hidden gap-8 text-[10px] font-black uppercase tracking-[0.4em] md:flex">
             {heroLinks.map((link) => (
               <motion.a
                 key={link.label}
@@ -626,7 +627,7 @@ export default function LandingPage() {
                 {link.label}
               </motion.a>
             ))}
-          </div>
+          </motion.div>
         </nav>
 
         <motion.div

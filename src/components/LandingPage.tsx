@@ -28,6 +28,14 @@ type VideoSource = {
   type: string;
 };
 
+type LegalModalKey = 'terms' | 'popia';
+
+type FooterLink = {
+  label: string;
+  href?: string;
+  modal?: LegalModalKey;
+};
+
 const useIsMobileViewport = () => {
   const [isMobileViewport, setIsMobileViewport] = useState(false);
 
@@ -353,21 +361,89 @@ const heroLinks = [
   { href: '#about', label: 'About' },
   { href: '#concept', label: 'Concept' },
   { href: '#contact', label: 'Contact' },
+  { href: '#footer', label: 'Library' },
 ];
 
-const footerLinks = [
+const footerLinks: FooterLink[] = [
   { href: '#about', label: 'About' },
   { href: '#concept', label: 'Concept' },
   { href: '#individuals', label: 'Buy' },
   { href: '#merchants', label: 'Sell' },
   { href: '#resources', label: 'Resources' },
   { href: '#contact', label: 'Contact' },
+  { label: 'Terms of Use', modal: 'terms' },
+  { label: 'POPIA', modal: 'popia' },
 ];
+
+const legalModalContent: Record<
+  LegalModalKey,
+  {
+    title: string;
+    intro: string;
+    sections: Array<{ heading: string; body: string }>;
+  }
+> = {
+  terms: {
+    title: 'Terms of Use',
+    intro:
+      'These Terms of Use apply to Tik’iBox services offered in South Africa, including wallet access, merchant tools, supplier features and customer payment journeys available through the platform.',
+    sections: [
+      {
+        heading: 'Using Tik’iBox',
+        body:
+          'You may use Tik’iBox only for lawful personal or business transactions. You agree to provide accurate account details, keep your login credentials secure and use the platform in a way that does not interfere with other users, merchants or community partners.',
+      },
+      {
+        heading: 'Payments and merchant activity',
+        body:
+          'Where Tik’iBox enables payments, order flows or digital merchant tools, users and merchants remain responsible for the accuracy of listings, prices, delivery arrangements, refunds and any tax obligations that apply to their activity in South Africa.',
+      },
+      {
+        heading: 'Compliance and suspension',
+        body:
+          'Tik’iBox may restrict or suspend access where we reasonably believe an account is being used for fraud, unlawful conduct, abuse of the platform or non-compliance with applicable South African law, platform rules or payment partner requirements.',
+      },
+      {
+        heading: 'Applicable law',
+        body:
+          'These terms are governed by the laws of the Republic of South Africa. Any dispute relating to the use of the platform will be handled in accordance with South African law and, where appropriate, the courts or tribunals with jurisdiction in South Africa.',
+      },
+    ],
+  },
+  popia: {
+    title: 'POPIA Notice',
+    intro:
+      'Tik’iBox processes personal information in line with the Protection of Personal Information Act, 2013 (POPIA). This notice explains, at a high level, how customer, merchant and supplier data may be collected and used on the platform.',
+    sections: [
+      {
+        heading: 'Information we collect',
+        body:
+          'We may collect contact details, device information, transaction details, business profile information, support messages and other information needed to operate wallet features, merchant onboarding, payments, fraud prevention and customer support.',
+      },
+      {
+        heading: 'Why we process it',
+        body:
+          'Your information may be processed to create and manage accounts, enable payments, verify activity, reduce fraud, communicate important service updates, improve the product and meet legal or regulatory obligations that apply in South Africa.',
+      },
+      {
+        heading: 'Sharing and protection',
+        body:
+          'Tik’iBox may share relevant information with payment processors, service providers, onboarding partners or authorities where this is necessary for service delivery, security, compliance or lawful requests. Reasonable technical and organisational safeguards are used to protect personal information.',
+      },
+      {
+        heading: 'Your rights',
+        body:
+          'Subject to POPIA, you may request access to your personal information, ask for correction or deletion where appropriate, object to certain processing or lodge a complaint with the Information Regulator of South Africa if you believe your information has been handled improperly.',
+      },
+    ],
+  },
+};
 
 export default function LandingPage() {
   const [expandedCard, setExpandedCard] = useState<'merchant' | 'customer' | null>('merchant');
   const [showFloatingTop, setShowFloatingTop] = useState(false);
   const [activeFooterCircle, setActiveFooterCircle] = useState<number | null>(null);
+  const [activeLegalModal, setActiveLegalModal] = useState<LegalModalKey | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const footerCircleRefs = useRef<Array<HTMLDivElement | null>>([]);
   const prefersReducedMotion = useReducedMotion();
@@ -442,6 +518,21 @@ export default function LandingPage() {
   const resetFooterPointer = () => {
     setActiveFooterCircle(null);
   };
+
+  useEffect(() => {
+    if (!activeLegalModal) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveLegalModal(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeLegalModal]);
 
   return (
     <div id="top" ref={containerRef} className="overflow-x-hidden bg-white text-tikibox-navy selection:bg-tikibox-orange selection:text-white">
@@ -1271,13 +1362,28 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      <footer className="relative overflow-hidden bg-tikibox-light pb-0 pt-20 sm:pt-32">
+      <footer id="footer" className="relative overflow-hidden bg-tikibox-light pb-0 pt-20 sm:pt-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-10 flex flex-wrap justify-center gap-x-8 gap-y-3 sm:mb-12 sm:gap-x-12 sm:gap-y-4">
             {footerLinks.map((link) => (
-              <a key={link.label} href={link.href} className="text-sm font-bold text-tikibox-navy transition-colors hover:text-tikibox-orange sm:text-base">
-                {link.label}
-              </a>
+              link.href ? (
+                <a key={link.label} href={link.href} className="text-sm font-bold text-tikibox-navy transition-colors hover:text-tikibox-orange sm:text-base">
+                  {link.label}
+                </a>
+              ) : link.modal ? (
+                <button
+                  key={link.label}
+                  type="button"
+                  onClick={() => setActiveLegalModal(link.modal ?? null)}
+                  className="text-sm font-bold text-tikibox-navy transition-colors hover:text-tikibox-orange sm:text-base"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <span key={link.label} className="text-sm font-bold text-tikibox-navy sm:text-base">
+                  {link.label}
+                </span>
+              )
             ))}
           </div>
 
@@ -1339,6 +1445,53 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </footer>
+
+      {activeLegalModal ? (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-[#0c1024]/60 px-4 py-6 backdrop-blur-sm"
+          onClick={() => setActiveLegalModal(null)}
+        >
+          <motion.div
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="legal-modal-title"
+            onClick={(event) => event.stopPropagation()}
+            className="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-white p-6 shadow-[0_30px_90px_rgba(12,16,36,0.24)] sm:p-8"
+          >
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="mb-3 text-[10px] font-black uppercase tracking-[0.38em] text-tikibox-orange">Legal</p>
+                <h3 id="legal-modal-title" className="text-2xl font-black text-tikibox-navy sm:text-3xl">
+                  {legalModalContent[activeLegalModal].title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveLegalModal(null)}
+                className="rounded-full border border-tikibox-navy/12 px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-tikibox-navy transition-colors hover:border-tikibox-orange hover:text-tikibox-orange"
+              >
+                Close
+              </button>
+            </div>
+
+            <p className="mb-6 max-w-2xl text-sm leading-7 text-tikibox-navy/72 sm:text-[15px]">
+              {legalModalContent[activeLegalModal].intro}
+            </p>
+
+            <div className="space-y-4">
+              {legalModalContent[activeLegalModal].sections.map((section) => (
+                <div key={section.heading} className="rounded-[1.5rem] border border-tikibox-navy/8 bg-[#f7f3ef] px-5 py-4">
+                  <h4 className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-tikibox-navy">{section.heading}</h4>
+                  <p className="text-sm leading-7 text-tikibox-navy/72 sm:text-[15px]">{section.body}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      ) : null}
     </div>
   );
 }

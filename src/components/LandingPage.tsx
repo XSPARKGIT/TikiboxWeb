@@ -361,7 +361,7 @@ const heroLinks = [
   { href: '#about', label: 'About' },
   { href: '#concept', label: 'Concept' },
   { href: '#contact', label: 'Contact' },
-  { href: '#footer', label: 'Library' },
+  { href: '#footer-end', label: 'Library' },
 ];
 
 const footerLinks: FooterLink[] = [
@@ -371,8 +371,6 @@ const footerLinks: FooterLink[] = [
   { href: '#merchants', label: 'Sell' },
   { href: '#resources', label: 'Resources' },
   { href: '#contact', label: 'Contact' },
-  { label: 'Terms of Use', modal: 'terms' },
-  { label: 'POPIA', modal: 'popia' },
 ];
 
 const legalModalContent: Record<
@@ -444,7 +442,9 @@ export default function LandingPage() {
   const [showFloatingTop, setShowFloatingTop] = useState(false);
   const [activeFooterCircle, setActiveFooterCircle] = useState<number | null>(null);
   const [activeLegalModal, setActiveLegalModal] = useState<LegalModalKey | null>(null);
+  const [hideFloatingNav, setHideFloatingNav] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLElement | null>(null);
   const footerCircleRefs = useRef<Array<HTMLDivElement | null>>([]);
   const prefersReducedMotion = useReducedMotion();
 
@@ -534,6 +534,23 @@ export default function LandingPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeLegalModal]);
 
+  useEffect(() => {
+    const footer = footerRef.current;
+    if (!footer) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setHideFloatingNav(entry.isIntersecting);
+      },
+      { threshold: 0.18 },
+    );
+
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div id="top" ref={containerRef} className="overflow-x-hidden bg-white text-tikibox-navy selection:bg-tikibox-orange selection:text-white">
       <motion.div className="fixed left-0 right-0 top-0 z-50 h-1 origin-left bg-tikibox-orange-gradient" style={{ scaleX: smoothProgress }} />
@@ -566,7 +583,7 @@ export default function LandingPage() {
         />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/40 to-transparent" />
 
-        <nav className="fixed left-1/2 top-3 z-40 flex w-[calc(100%-1.5rem)] max-w-7xl -translate-x-1/2 items-center justify-between px-4 py-6 sm:top-4 sm:w-[calc(100%-3rem)] sm:px-6 sm:py-7">
+        <nav className={`fixed left-1/2 top-3 z-40 flex w-[calc(100%-1.5rem)] max-w-7xl -translate-x-1/2 items-center justify-between px-4 py-6 transition-opacity duration-300 sm:top-4 sm:w-[calc(100%-3rem)] sm:px-6 sm:py-7 ${hideFloatingNav ? 'pointer-events-none opacity-0' : 'opacity-100'}`}>
           <motion.div
             style={{ opacity: navOverlayOpacity }}
             className="pointer-events-none absolute inset-0 rounded-full border border-white/12 bg-[#16162b]/60 shadow-[0_18px_50px_rgba(6,8,20,0.35)] backdrop-blur-2xl"
@@ -618,10 +635,6 @@ export default function LandingPage() {
           animate="visible"
           className="relative z-20 flex flex-1 flex-col items-center justify-center px-4 text-center sm:px-6"
         >
-          <motion.p variants={revealUp} className="mb-8 text-[9px] font-black uppercase tracking-[0.4em] text-white/40 sm:mb-10 sm:text-[10px] sm:tracking-[0.5em]">
-            Launch with confidence
-          </motion.p>
-
           <motion.h1 variants={revealUp} className="mb-3 text-center font-display text-[2.25rem] font-black uppercase leading-[0.9] tracking-tighter sm:mb-2 sm:text-4xl md:text-6xl lg:text-7xl">
             The Pulse of <br />
             Community Commerce
@@ -1362,7 +1375,7 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      <footer id="footer" className="relative overflow-hidden bg-tikibox-light pb-0 pt-20 sm:pt-32">
+      <footer id="footer" ref={footerRef} className="relative overflow-hidden bg-tikibox-light pb-0 pt-20 sm:pt-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-10 flex flex-wrap justify-center gap-x-8 gap-y-3 sm:mb-12 sm:gap-x-12 sm:gap-y-4">
             {footerLinks.map((link) => (
@@ -1388,9 +1401,17 @@ export default function LandingPage() {
           </div>
 
           <div className="mb-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-tikibox-navy/60 sm:mb-32 sm:gap-x-12 sm:gap-y-4 sm:text-sm">
-            <p>© 2026 Tik’iBox, all rights reserved.</p>
+            <a href="https://www.xspark.co.za" target="_blank" rel="noreferrer" className="transition-colors hover:text-tikibox-orange">
+              Developed By X Spark
+            </a>
             <span>Launch narrative</span>
             <span>Community-first commerce</span>
+            <button type="button" onClick={() => setActiveLegalModal('terms')} className="transition-colors hover:text-tikibox-orange">
+              Terms of Use
+            </button>
+            <button type="button" onClick={() => setActiveLegalModal('popia')} className="transition-colors hover:text-tikibox-orange">
+              POPIA
+            </button>
             <span>Crafted for motion</span>
           </div>
         </div>
@@ -1445,10 +1466,11 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </footer>
+      <div id="footer-end" className="h-px w-full" />
 
       {activeLegalModal ? (
         <div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-[#0c1024]/60 px-4 py-6 backdrop-blur-sm"
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-[#0c1024]/60 px-3 py-4 backdrop-blur-sm sm:px-4 sm:py-6"
           onClick={() => setActiveLegalModal(null)}
         >
           <motion.div
@@ -1459,12 +1481,12 @@ export default function LandingPage() {
             aria-modal="true"
             aria-labelledby="legal-modal-title"
             onClick={(event) => event.stopPropagation()}
-            className="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-white p-6 shadow-[0_30px_90px_rgba(12,16,36,0.24)] sm:p-8"
+            className="max-h-[calc(100vh-2rem)] w-full max-w-xl overflow-y-auto rounded-[1.5rem] border border-white/10 bg-white p-4 shadow-[0_30px_90px_rgba(12,16,36,0.24)] sm:max-h-[calc(100vh-3rem)] sm:rounded-[2rem] sm:p-6"
           >
-            <div className="mb-6 flex items-start justify-between gap-4">
+            <div className="mb-4 flex items-start justify-between gap-3 sm:mb-6 sm:gap-4">
               <div>
                 <p className="mb-3 text-[10px] font-black uppercase tracking-[0.38em] text-tikibox-orange">Legal</p>
-                <h3 id="legal-modal-title" className="text-2xl font-black text-tikibox-navy sm:text-3xl">
+                <h3 id="legal-modal-title" className="text-xl font-black text-tikibox-navy sm:text-2xl">
                   {legalModalContent[activeLegalModal].title}
                 </h3>
               </div>
@@ -1477,15 +1499,15 @@ export default function LandingPage() {
               </button>
             </div>
 
-            <p className="mb-6 max-w-2xl text-sm leading-7 text-tikibox-navy/72 sm:text-[15px]">
+            <p className="mb-4 max-w-2xl text-[13px] leading-6 text-tikibox-navy/72 sm:mb-6 sm:text-sm sm:leading-7">
               {legalModalContent[activeLegalModal].intro}
             </p>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {legalModalContent[activeLegalModal].sections.map((section) => (
-                <div key={section.heading} className="rounded-[1.5rem] border border-tikibox-navy/8 bg-[#f7f3ef] px-5 py-4">
-                  <h4 className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-tikibox-navy">{section.heading}</h4>
-                  <p className="text-sm leading-7 text-tikibox-navy/72 sm:text-[15px]">{section.body}</p>
+                <div key={section.heading} className="rounded-[1.25rem] border border-tikibox-navy/8 bg-[#f7f3ef] px-4 py-3 sm:rounded-[1.5rem] sm:px-5 sm:py-4">
+                  <h4 className="mb-2 text-[12px] font-black uppercase tracking-[0.18em] text-tikibox-navy sm:text-sm sm:tracking-[0.2em]">{section.heading}</h4>
+                  <p className="text-[13px] leading-6 text-tikibox-navy/72 sm:text-sm sm:leading-7">{section.body}</p>
                 </div>
               ))}
             </div>
